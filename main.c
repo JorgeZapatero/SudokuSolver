@@ -60,74 +60,6 @@ void eliminate(int * in, int n){
     *in = (*in) & (mask);
 }
 
-int markup_length(int n){
-    int i, count;
-    count = 0;
-    for (i=0; i<9; i++){
-        count += n%2;
-        n/=2;
-    }
-
-    return count;
-}
-
-//returns # of entries in the res array
-int get_markup_contents(int n, int * res){
-    int i, count = 0;
-    for(i = 0; i < 8; i++){
-        if(n%2 == 1){
-            res[count] = i+1;
-            count++;
-        }
-        n/=2;
-    }
-    return count;
-}
-
-int find_preemptive_set(){
-    int i,j, m,n;
-    int len, num, count;
-    int markup_contents[8];
-    count = 0;
-
-    for(i=0; i<9; i++){
-        for(j=0; j<9; j++){
-            
-            num = board[i][j];
-            if (num>0 && num<10) continue;
-
-            len = markup_length(num);
-            if (len <1 || len > 8) continue;
-
-            //search in row
-            count = 0;
-            for(m=0; m<9; m++){
-                if (board[m][j] == num) count++;
-            } 
-            if (count == len) {
-                // we found a preemptive set!
-                get_markup_contents(num, markup_contents);
-                for(m=0; m<9; m++){
-                    if(board[m][j]>9 && board[m][j] != num){
-                        for(n=0; n<len; n++){
-                            eliminate( &board[m][j], markup_contents[n]);
-                        }
-                    }
-                }
-                return 1;
-            }
-            
-            //search in collumn
-            //search in square
-
-            //if a set is found, eliminate values from all other squares/rows/collumns
-        }
-    }
-    return 0;
-}
-
-
-
 // returns 0 if no single solution is found
 // returns 1 if a single solution was found
 // sets the input integer to the single solution
@@ -162,6 +94,79 @@ int single_solution(int * markup_num){
     *markup_num = res;
     return 1;
 }
+
+int markup_length(int n){
+    int i, count;
+    count = 0;
+    for (i=0; i<9; i++){
+        count += n%2;
+        n/=2;
+    }
+
+    return count;
+}
+
+//returns # of entries in the res array
+int get_markup_contents(int n, int * res){
+    int i, count = 0;
+    for(i = 0; i < 8; i++){
+        if(n%2 == 1){
+            res[count] = i+1;
+            count++;
+        }
+        n/=2;
+    }
+    return count;
+}
+
+int find_preemptive_set(){
+    int i,j, m,n;
+    int len, num, count;
+    int markup_contents[8];
+    for(i=0; i<9; i++){
+        for(j=0; j<9; j++){
+
+            count = 0;
+            
+            num = board[i][j];
+            if (num>0 && num<10) continue;
+
+            len = markup_length(num);
+            if (len < 2 || len > 8) continue;
+
+            
+            
+            //search in row
+            for (m=0; m<9; m++){
+                if (board[i][m] == num){
+                    count++;
+                    printf("count++\n");
+                }
+            }
+            printf("count: %i, len: %i\n", count, len);
+            if (count == len){
+                printf("preemptive set found for %i\n", num);
+                for(m=0; m<9; m++){
+                    printf("%i becomes ", board[i][m]);
+
+
+                    //eliminate from row
+                    if(board[i][m]>9 && board[i][m] != num){
+                        board[i][m] = ((num ^ board[i][m]) & board[i][m]) + 512;
+                    }
+                   printf("%i\n", board[i][m]);
+                }
+                return 1;
+            }
+
+        }
+    }
+    return 0;
+}
+
+
+
+
 
 void print_markup_value(int n){
     int i;
@@ -267,6 +272,10 @@ int main(){
     if(found == 1) printf("preemptive set succesful\n");
     else printf("preemptive set unsuccesful\n");
 
+
+
+
+
     
 //    int found = 1;
 //    while(found > 0){
@@ -311,7 +320,6 @@ int main(){
 // END TEST markup_length    
 
 
-   
     printf("fin.\n");	
 }
 
