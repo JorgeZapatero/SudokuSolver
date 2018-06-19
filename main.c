@@ -119,23 +119,69 @@ int get_markup_contents(int n, int * res){
     return count;
 }
 
+void scrub(int * board_val, int num){
+    int val = * board_val;
+
+    printf("%i becomes ", val);
+    if(val >9 && val != num){
+        *board_val = ((num ^ val) & val) + 512;
+        single_solution(board_val);
+    }
+    printf("%i\n", *board_val);
+}
+
+void scrub_collumn(int c, int num){
+    int i;
+    for (i = 0; i<9; i++){
+        scrub(&board[i][c], num);
+    }
+}
+
+void scrub_row(int r, int num){
+    int i;
+    for (i = 0; i<9; i++){
+        scrub(&board[r][i], num);
+    }
+}
+
+void scrub_square(int r, int c, int n){
+    //use % to collapse r and c int proper square index
+    //run scrub function on each position in the square (double for loop)
+}
+
 int find_preemptive_set(){
+    //select an anchor index pair
+    //  +search in collumn for a preemptive set
+    //     + if a set is found
+    //         * does the set exist in the same box?
+    //             * scrub the box
+    //     + scrub the collumn
+    //  + search in a row
+    //      + if a set is found
+    //          * does the set exist in the same box?
+    //              * scrub the box
+    //      + scrub the row
+
+
     int i,j, m,n;
     int len, num, count;
     int markup_contents[8];
-    for(i=0; i<9; i++){
+    for(i=0; i<9; i++){ //for each position
         for(j=0; j<9; j++){
 
-            count = 0;
             
             num = board[i][j];
-            if (num>0 && num<10) continue;
+            if (num>0 && num<10) continue; //skip solutions
 
             len = markup_length(num);
-            if (len < 2 || len > 8) continue;
+            if (len > 8) continue; // too many solutions
+            if (len < 2) { //shouldn't be just on solution
+                printf("!! markup len = %i, markup = %i, too small !!\n",len,num);
+                continue;
+            }
 
-
-            //search in collumn
+            //SEARCH IN COLLUMN
+            count = 0;
             for (m=0; m<9; m++){
                 if (board[m][j] == num){
                     count++;
@@ -145,49 +191,29 @@ int find_preemptive_set(){
             printf("count: %i, len: %i\n", count, len);
             if (count == len){
                 printf("preemptive set found for %i, len: %i\n", num, len);
-                for(m=0; m<9; m++){
-                    printf("%i becomes ", board[m][j]);
-
-                    //eliminate from row
-                    if(board[m][j]>9 && board[m][j] != num){
-                        board[m][j] = ((num ^ board[m][j]) & board[m][j]) + 512;
-                        single_solution( &board[m][j]);
-                    }
-                   printf("%i\n", board[m][j]);
-                }
+                scrub_collumn(j, num);
                 return 1;
             }
-            
-            
-            //search in row
+
+
+            //SEARCH IN ROW
+            count = 0;
             for (m=0; m<9; m++){
                 if (board[i][m] == num){
                     count++;
-                    //printf("count++\n");
+                    printf("count++\n");
                 }
             }
             printf("count: %i, len: %i\n", count, len);
             if (count == len){
-                printf("preemptive set found for %i\n", num);
-                for(m=0; m<9; m++){
-                    printf("%i becomes ", board[i][m]);
-
-
-                    //eliminate from row
-                    if(board[i][m]>9 && board[i][m] != num){
-                        board[i][m] = ((num ^ board[i][m]) & board[i][m]) + 512;
-                        single_solution( &board[m][j]);
-                    }
-                   printf("%i\n", board[i][m]);
-                }
+                printf("preemptive set found for %i, len: %i\n", num, len);
+                scrub_row(i, num);
                 return 1;
             }
         }
     }
     return 0;
 }
-
-
 
 
 
@@ -285,7 +311,7 @@ int main(){
         
         j = k % 9;
         if (j==0) i++;
-        board[i][j] = game4[k];
+        board[i][j] = game3[k];
     }
 
 
@@ -348,7 +374,7 @@ int main(){
 
     printf("fin.\n");	
 
-    printf("%i\n", (0b1101110000 ^ 0b1001010000) + 512);
+//    printf("%i\n", (0b1101110000 ^ 0b1001010000) + 512);
 }
 
 
