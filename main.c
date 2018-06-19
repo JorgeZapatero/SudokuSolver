@@ -176,6 +176,7 @@ int find_preemptive_set(){
                     //eliminate from row
                     if(board[i][m]>9 && board[i][m] != num){
                         board[i][m] = ((num ^ board[i][m]) & board[i][m]) + 512;
+                        single_solution( &board[m][j]);
                     }
                    printf("%i\n", board[i][m]);
                 }
@@ -222,6 +223,9 @@ int markup(){
             }
 
             if (single_solution( &board[i][j]) == 1){
+                
+                
+                //!!UNCOMENT for RECURSIVE MARKUP()
                 //return markup() +1;
             }
         }
@@ -281,7 +285,7 @@ int main(){
         
         j = k % 9;
         if (j==0) i++;
-        board[i][j] = game3[k];
+        board[i][j] = game4[k];
     }
 
 
