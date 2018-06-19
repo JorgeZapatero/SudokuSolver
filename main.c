@@ -144,24 +144,22 @@ int find_preemptive_set(){
             }
             printf("count: %i, len: %i\n", count, len);
             if (count == len){
-                printf("preemptive set found for %i\n", num);
+                printf("preemptive set found for %i, len: %i\n", num, len);
                 for(m=0; m<9; m++){
-                    printf("%i becomes ", board[i][m]);
-
+                    printf("%i becomes ", board[m][j]);
 
                     //eliminate from row
                     if(board[m][j]>9 && board[m][j] != num){
                         board[m][j] = ((num ^ board[m][j]) & board[m][j]) + 512;
+                        single_solution( &board[m][j]);
                     }
                    printf("%i\n", board[m][j]);
                 }
                 return 1;
             }
-
             
             
             //search in row
-            /*
             for (m=0; m<9; m++){
                 if (board[i][m] == num){
                     count++;
@@ -183,8 +181,6 @@ int find_preemptive_set(){
                 }
                 return 1;
             }
-            */
-
         }
     }
     return 0;
@@ -275,7 +271,7 @@ void print_board(){
 
 int main(){
 
-//    printf("%i\n", 0b1000000000);
+
 
     int i, j, k;
     
@@ -285,7 +281,7 @@ int main(){
         
         j = k % 9;
         if (j==0) i++;
-        board[i][j] = game4[k];
+        board[i][j] = game3[k];
     }
 
 
@@ -347,6 +343,8 @@ int main(){
 
 
     printf("fin.\n");	
+
+    printf("%i\n", (0b1101110000 ^ 0b1001010000) + 512);
 }
 
 
